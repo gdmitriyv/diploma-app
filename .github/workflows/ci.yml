@@ -1,0 +1,69 @@
+name: CI/CD
+
+# Любой коммит в main: сборка образа и отправка в реестр (тег sha-<коммит>).
+# Тег v*: сборка образа с этим тегом, отправка в реестр и деплой в кластер.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: cr.yandex/crp7nu76gnb646d9a9ho/nginx-app
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.vars.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compute image tag
+        id: vars
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Yandex Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: cr.yandex
+          username: json_key
+          password: ${{ secrets.YC_CI_KEY }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE }}:${{ steps.vars.outputs.tag }}
+
+  deploy:
+    # Деплой только при создании тега v*
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Configure kubectl
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy new image
+        run: |
+          kubectl -n app set image deployment/nginx-app nginx-app=${{ env.IMAGE }}:${{ needs.build.outputs.tag }}
+          kubectl -n app rollout status deployment/nginx-app --timeout=180s
