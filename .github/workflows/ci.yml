@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE: cr.yandex/crp7nu76gnb646d9a9ho/nginx-app
+  IMAGE: cr.yandex/${{ vars.REGISTRY_ID }}/nginx-app
 
 jobs:
   build:
