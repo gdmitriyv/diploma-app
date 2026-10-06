@@ -1,10 +1,9 @@
-cat > nginx-app/index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Дипломный проект tag DevOps — Nginx App</title>
+  <title>Дипломный проект DevOps — Nginx App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,14 +18,18 @@ cat > nginx-app/index.html << 'EOF'
     .photo {
       max-width: 100%;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .version {
+      color: #666;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <h1>Добро пожаловать в мой дипломный проект!</h1>
   <p>Это тестовое приложение на Nginx, развёрнутое в Kubernetes-кластере Yandex Cloud.</p>
-  <img src="assets/photo.jpg" alt="Моя фотография" class="photo">
+  <p>Сборка и деплой выполняются автоматически: GitHub Actions собирает образ, отправляет его в Yandex Container Registry и обновляет приложение в кластере при создании тега.</p>
+  <img class="photo" src="assets/photo.jpg" alt="Иллюстрация к дипломному проекту">
+  <p class="version">Версия: v1.0.1</p>
 </body>
 </html>
-EOF
