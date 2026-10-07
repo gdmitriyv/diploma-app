@@ -32,6 +32,9 @@ jobs:
             echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Put version into the page
+        run: sed -i "s/__VERSION__/${{ steps.vars.outputs.tag }}/" index.html
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
