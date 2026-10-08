@@ -43,3 +43,8 @@ git commit -m "Описание изменений"
 git push origin main
 git tag v1.2.0
 git push origin v1.2.0
+
+
+<img width="1813" height="951" alt="14 action git diploma app" src="https://github.com/user-attachments/assets/7aabbfc7-dc04-4f85-8843-b19d9d38a2df" />
+<img width="1426" height="839" alt="11  app up" src="https://github.com/user-attachments/assets/69246443-d8fb-469a-8891-01cc334252b9" />
+
